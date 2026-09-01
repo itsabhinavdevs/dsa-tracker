@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // everything nested under /users/{uid}/... is only readable/writable by that user
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // collectionGroup("questions") query used for the topbar pattern-count badge
+    // relies on the ownerId field stamped on every question doc
+    match /{path=**}/questions/{questionId} {
+      allow read: if request.auth != null
+                   && request.auth.uid == resource.data.ownerId;
+    }
+  }
+}
