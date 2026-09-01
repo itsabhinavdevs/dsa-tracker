@@ -1,0 +1,33 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body {
+  background: #0E1014;
+  color: #E7E9EE;
+  font-family: "IBM Plex Sans", sans-serif;
+}
+
+h1, h2, h3, .display {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+code, pre, .mono {
+  font-family: "IBM Plex Mono", monospace;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2A303B transparent;
+}
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #2A303B; border-radius: 8px; }
+
+.diff-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
