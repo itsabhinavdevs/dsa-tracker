@@ -41,3 +41,5 @@ next-env.d.ts
 
 # editor/agent tooling
 .agents/
+
+serviceAccountKey.json
