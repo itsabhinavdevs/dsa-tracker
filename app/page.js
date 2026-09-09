@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/useAuth";
 import Heatmap from "@/components/Heatmap";
+import ProgressBar from "@/components/ProgressBar";
 import {
   todayId,
   listenTodayGoal,
@@ -13,6 +14,9 @@ import {
   addGoal,
   toggleGoal,
   listenHeatmap,
+  listenGlobalTopics,
+  listenGlobalProgressAll,
+  listenMyQuestionsStats,
 } from "@/lib/firestore";
 
 export default function Dashboard() {
@@ -36,6 +40,10 @@ export default function Dashboard() {
   const [pHeat, setPHeat] = useState({});
   const [nHeat, setNHeat] = useState({});
 
+  const [globalTopics, setGlobalTopics] = useState([]);
+  const [globalProgress, setGlobalProgress] = useState({});
+  const [myStats, setMyStats] = useState({ total: 0, completed: 0 });
+
   useEffect(() => {
     if (!uid) return;
     pruneOldDailyGoals(uid);
@@ -44,10 +52,18 @@ export default function Dashboard() {
     const un3 = listenHeatmap(uid, "questions", setQHeat);
     const un4 = listenHeatmap(uid, "pattern", setPHeat);
     const un5 = listenHeatmap(uid, "note", setNHeat);
+    const un6 = listenGlobalTopics(setGlobalTopics);
+    const un7 = listenGlobalProgressAll(uid, setGlobalProgress);
+    const un8 = listenMyQuestionsStats(uid, setMyStats);
     return () => {
-      un1(); un2(); un3(); un4(); un5();
+      un1(); un2(); un3(); un4(); un5(); un6(); un7(); un8();
     };
   }, [uid, today]);
+
+  const globalTotal = globalTopics.reduce((s, t) => s + (t.questionCount || 0), 0);
+  const globalCompleted = Object.values(globalProgress).filter((p) => p.completed).length;
+  const overallTotal = globalTotal + myStats.total;
+  const overallCompleted = globalCompleted + myStats.completed;
 
   async function saveTodayGoal() {
     if (!topicInput.trim() || !questionInput.trim()) return;
@@ -220,6 +236,21 @@ export default function Dashboard() {
           </div>
         </section>
       </div>
+
+      {/* overall progress across shared sheet + your own topics */}
+      <section className="bg-panel border border-line rounded-card p-4">
+        <div className="flex items-center justify-between mb-2">
+          <h2 className="display font-semibold">Overall progress</h2>
+          <span className="text-xs text-muted mono">
+            {overallTotal > 0 ? Math.round((overallCompleted / overallTotal) * 100) : 0}%
+          </span>
+        </div>
+        <ProgressBar completed={overallCompleted} total={overallTotal} accent="#4FD1C5" />
+        <div className="flex gap-6 mt-3 text-xs text-muted">
+          <span>Shared sheet: {globalCompleted}/{globalTotal}</span>
+          <span>My topics: {myStats.completed}/{myStats.total}</span>
+        </div>
+      </section>
 
       {/* heatmaps */}
       <section id="heatmap" className="space-y-6">
