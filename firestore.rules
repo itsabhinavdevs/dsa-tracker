@@ -13,5 +13,20 @@ service cloud.firestore {
       allow read: if request.auth != null
                    && request.auth.uid == resource.data.ownerId;
     }
+
+    // the shared/global sheet (e.g. imported from a public DSA sheet).
+    // Every signed-in user can read it. It is only ever written by the
+    // seed script (scripts/seed-global-topics.mjs) using the Admin SDK,
+    // which bypasses these rules entirely — so "write: false" here just
+    // blocks normal signed-in users/clients from editing the shared data.
+    match /global_topics/{topicId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+
+      match /questions/{questionId} {
+        allow read: if request.auth != null;
+        allow write: if false;
+      }
+    }
   }
 }
