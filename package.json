@@ -16,6 +16,7 @@
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@opentelemetry/api": "^1.9.1",
     "autoprefixer": "^10.4.19",
     "firebase-admin": "^12.3.1",
     "postcss": "^8.4.38",
